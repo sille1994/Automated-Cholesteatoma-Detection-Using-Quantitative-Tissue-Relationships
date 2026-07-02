@@ -35,7 +35,9 @@ The pipeline consists of six sequential processing steps:
 
   **STEP 6**             Extract volumetric and ratio-based radiological
                          features and export them to a CSV file.
-  -----------------------------------------------------------------------
+  
+  
+-----------------------------------------------------------------------
 
 ------------------------------------------------------------------------
 
@@ -244,14 +246,3 @@ Master's thesis and acknowledge the Auditory Biophysics Laboratory
 (Western University) for providing the automatic ossicle segmentation
 model.
 
-------------------------------------------------------------------------
-
-# Future Improvements
-
-Possible future additions include:
-
--   Pipeline overview figure
--   Example input and output data
--   Docker installation guide
--   Example dataset
--   Performance benchmarks
