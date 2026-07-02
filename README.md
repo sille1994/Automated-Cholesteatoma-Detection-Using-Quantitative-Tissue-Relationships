@@ -216,7 +216,6 @@ The batch runner will automatically:
 - Launch every processing step in a new Python process, ensuring that memory is released after each script and preventing memory accumulation during large batch analyses.
 - Write all console output, warnings, and errors to `Pipeline_log.txt`.
 
----
 
 # Resume Interrupted Processing
 
@@ -238,7 +237,6 @@ FORCE_RERUN = False
 - `SKIP_COMPLETED = True` automatically skips completed processing steps.
 - `FORCE_RERUN = True` forces all processing steps to be executed again, regardless of existing output files.
 
----
 
 # Optional Patient Filtering
 
@@ -250,7 +248,6 @@ USE_FILTER = False
 
 When enabled, only patient IDs listed in the `valid_patients` set will be processed.
 
----
 
 # Log File
 
@@ -262,7 +259,6 @@ Pipeline_log.txt
 
 This log file can be used to monitor progress and troubleshoot failed processing steps.
 
----
 
 # Typical Workflow
 
