@@ -192,6 +192,92 @@ patients.
 
 ------------------------------------------------------------------------
 
+# Running the Complete Pipeline (STIL IN WORK)
+
+The repository includes a master batch runner (`Pipeline_runner.py`) that automatically executes the complete image-processing pipeline. For most users, this is the **only script that needs to be executed**.
+
+Run the pipeline using:
+
+```bash
+python Pipeline_runner.py
+```
+
+The batch runner will automatically:
+
+- Search the `Scans/` directory for patient folders.
+- Create the `Results/` and `Results_seg/` directories if they do not already exist.
+- Execute all processing steps in the correct order:
+  1. `STEP_1_Segmenting.py`
+  2. `STEP_2_InnerSegmentation.py`
+  3. `STEP_3_Mask_filler.py`
+  4. `STEP_4_ROI_Kmean.py`
+  5. `STEP_5_ROI_Ossicles.py`
+  6. `STEP_6_Measurements.py`
+- Launch every processing step in a new Python process, ensuring that memory is released after each script and preventing memory accumulation during large batch analyses.
+- Write all console output, warnings, and errors to `Pipeline_log.txt`.
+
+---
+
+# Resume Interrupted Processing
+
+The pipeline supports automatic resumption of interrupted analyses.
+
+Before executing each processing step, the batch runner checks whether the expected output file already exists. If the output is found, the corresponding step is skipped automatically.
+
+If the final feature table already exists for a patient, the entire patient is skipped.
+
+This allows interrupted batch runs to continue from the last unfinished step instead of restarting from the beginning.
+
+The behaviour can be controlled at the top of `Pipeline_runner.py`:
+
+```python
+SKIP_COMPLETED = True
+FORCE_RERUN = False
+```
+
+- `SKIP_COMPLETED = True` automatically skips completed processing steps.
+- `FORCE_RERUN = True` forces all processing steps to be executed again, regardless of existing output files.
+
+---
+
+# Optional Patient Filtering
+
+Processing can optionally be restricted to a predefined subset of patients.
+
+```python
+USE_FILTER = False
+```
+
+When enabled, only patient IDs listed in the `valid_patients` set will be processed.
+
+---
+
+# Log File
+
+During execution, all messages, warnings, and errors are written to:
+
+```text
+Pipeline_log.txt
+```
+
+This log file can be used to monitor progress and troubleshoot failed processing steps.
+
+---
+
+# Typical Workflow
+
+1. Place the CBCT DICOM folders inside `Scans/`.
+2. Generate the automatic ossicle segmentations using the ABL segmentation model and place them in `Seg/`.
+3. Run:
+
+```bash
+python Pipeline_runner.py
+```
+
+4. The extracted radiological features will automatically be saved in the output directory after all processing steps have completed.
+
+------------------------------------------------------------------------
+
 # Output
 
 The pipeline generates:
