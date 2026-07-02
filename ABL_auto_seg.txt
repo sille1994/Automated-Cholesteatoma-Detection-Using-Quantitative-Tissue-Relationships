@@ -1,0 +1,88 @@
+import os
+import subprocess
+import SimpleITK as sitk
+
+# =======================
+# CONFIGURATION
+# =======================
+
+DICOM_ROOT = r"C:\Users\Admin\Desktop\segmentations"
+WORK_DIR   = r"C:\Users\Admin\Desktop\Automatic-segmentation"
+OUT_DIR    = r"C:\Users\Admin\Desktop\Automatic-segmentation\auto_seg_results"
+DOCKER_IMG = "uwoabl/temporal-bone-segmentation"
+
+os.makedirs(WORK_DIR, exist_ok=True)
+os.makedirs(OUT_DIR, exist_ok=True)
+
+# =======================
+# FUNCTIONS
+# =======================
+
+def find_dicom_folder(parent_folder):
+    """
+    Finds the first subfolder that actually contains DICOM files.
+    """
+    for root, dirs, files in os.walk(parent_folder):
+        for f in files:
+            if f.lower().endswith(".dcm"):
+                return root
+    raise RuntimeError("No DICOM files found")
+
+
+def dicom_to_nifti(dicom_folder, output_nii):
+    reader = sitk.ImageSeriesReader()
+    series_ids = reader.GetGDCMSeriesIDs(dicom_folder)
+
+    if not series_ids:
+        raise RuntimeError("No DICOM series found")
+
+    series_files = reader.GetGDCMSeriesFileNames(dicom_folder, series_ids[0])
+    reader.SetFileNames(series_files)
+
+    image = reader.Execute()
+    sitk.WriteImage(image, output_nii)
+
+
+def run_segmentation(input_nii, output_nii):
+    docker_cmd = [
+        "docker", "run", "--rm",
+        "-v", f"{WORK_DIR}:/data",
+        DOCKER_IMG,
+        "-i", f"/data/{os.path.basename(input_nii)}",
+        "-o", f"/data/{os.path.basename(output_nii)}"
+    ]
+    subprocess.run(docker_cmd, check=True)
+
+
+# =======================
+# MAIN LOOP
+# =======================
+
+for case_name in os.listdir(DICOM_ROOT):
+    case_folder = os.path.join(DICOM_ROOT, case_name)
+
+    if not os.path.isdir(case_folder):
+        continue
+
+    print(f"\nProcessing case: {case_name}")
+
+    try:
+
+        dicom_folder = find_dicom_folder(case_folder)
+
+        temp_nii  = os.path.join(WORK_DIR, f"{case_name}.nii.gz")
+        temp_seg  = os.path.join(WORK_DIR, f"seg_auto_{case_name}.nii")
+        final_seg = os.path.join(OUT_DIR, f"seg_auto_{case_name}.nii")
+
+        print(f"  DICOM folder: {dicom_folder}")
+        print("  Converting DICOM → NIfTI...")
+        dicom_to_nifti(dicom_folder, temp_nii)
+
+        print("  Running segmentation...")
+        run_segmentation(temp_nii, temp_seg)
+
+        os.replace(temp_seg, final_seg)
+        print(f"  ✅ Done: seg_auto_{case_name}.nii")
+
+    except Exception as e:
+        print(f"  ❌ Failed for {case_name}: {e}")

@@ -1,0 +1,13 @@
+ABL TUTORIAL 
+Instructions for using ABL temporal bone segmentation with docker desktop 
+Instructions for using automatic segmentations with docker desktop 
+
+- Open windows terminal and docker desktop
+- Pull the docker image 
+ 
+		docker pull uwoabl/temporal-bone-segmentation:latest
+
+- Prepare the data, the input must be a .nii/.nii.gz file 
+- Perform segmentation: 
+
+	docker run --rm -v working_directory -i input_directory -o output_directory
