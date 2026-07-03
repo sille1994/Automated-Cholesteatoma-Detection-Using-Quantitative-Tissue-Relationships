@@ -131,7 +131,7 @@ mask_big = np.transpose(mask_b.get_fdata() > 0, (2, 1, 0))
 mask_Km = nib.load(os.path.join(OUT_DIR_CACHE, "kmeans_4class_roi_bone_5.nii.gz"))
 kmeans_volume = np.transpose(mask_Km.get_fdata(), (2,1,0)).astype(np.uint8)
 
-# Find gennemsnitlig intensitet for hver label
+# Find the average for each label
 label_means = []
 
 for lab in range(1,6):
@@ -145,7 +145,7 @@ for lab in range(1,6):
 
 label_means = np.array(label_means)
 
-# Sorter efter intensitet
+# Sorting
 order = np.argsort(label_means)
 
 
