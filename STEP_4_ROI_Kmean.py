@@ -222,7 +222,7 @@ center = coords_ossicles.mean(axis=0).astype(int)
 
 # Calculate the voxels distance
 radius_vox_xy = int(5 / voxel_size)
-z_margin_vox = int(15 / voxel_size)
+z_margin_vox = int(7.5 / voxel_size)
         
 # Extracts the dimensions of your 3D CBCT volume.
 z_dim, y_dim, x_dim = volume.shape
